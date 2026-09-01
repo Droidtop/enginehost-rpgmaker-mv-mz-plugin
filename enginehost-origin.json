@@ -1,0 +1,14 @@
+{
+  "description": "Enginehost plugin implementation repository for RPG Maker MV and MZ",
+  "engine": "rpgmaker",
+  "engineContexts": [
+    "mv",
+    "mz"
+  ],
+  "formatVersion": 1,
+  "implementation": {
+    "id": "enginehost-native",
+    "name": "Enginehost native"
+  },
+  "origin": "https://github.com/droidtop/enginehost-rpgmaker-mv-mz-plugin"
+}
