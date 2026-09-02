@@ -4,12 +4,14 @@
     {
       "id": "rpgmaker-mv-web-1.6.2",
       "engineContext": "mv",
-      "runtimeVersion": "1.6.2"
+      "runtimeVersion": "1.6.2",
+      "acceptsAnyEngineVersion": true
     },
     {
       "id": "rpgmaker-mz-web-1.9.0",
       "engineContext": "mz",
-      "runtimeVersion": "1.9.0"
+      "runtimeVersion": "1.9.0",
+      "acceptsAnyEngineVersion": true
     }
   ]
 }
