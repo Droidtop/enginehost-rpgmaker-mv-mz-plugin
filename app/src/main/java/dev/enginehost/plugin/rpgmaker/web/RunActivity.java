@@ -28,13 +28,13 @@ public final class RunActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
 
-        String context = getIntent().getStringExtra("engineContext");
+        String context = getIntent().getStringExtra("dev.enginehost.runtime.ENGINE_CONTEXT");
         if (!"mv".equals(context) && !"mz".equals(context)) {
             fail("Unsupported RPG Maker engineContext: " + context);
             return;
         }
 
-        String path = getIntent().getStringExtra("path");
+        String path = getIntent().getStringExtra("dev.enginehost.runtime.PATH");
         if (path == null || !(gameRoot = new File(path)).isDirectory()) {
             fail("enginehost did not provide a valid game folder");
             return;
@@ -49,7 +49,7 @@ public final class RunActivity extends Activity {
             return;
         }
 
-        String entry = getIntent().getStringExtra("execFile");
+        String entry = getIntent().getStringExtra("dev.enginehost.runtime.EXEC_FILE");
         if (entry == null || entry.isBlank()) entry = options.optString("entryPoint", "index.html");
         File entryFile;
         try {
