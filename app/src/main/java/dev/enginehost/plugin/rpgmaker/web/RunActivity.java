@@ -42,7 +42,7 @@ public final class RunActivity extends Activity {
 
         JSONObject options;
         try {
-            String raw = getIntent().getStringExtra("options");
+            String raw = getIntent().getStringExtra("dev.enginehost.runtime.OPTIONS");
             options = raw == null || raw.isBlank() ? new JSONObject() : new JSONObject(raw);
         } catch (JSONException error) {
             fail("RPG Maker options must be a JSON object");
