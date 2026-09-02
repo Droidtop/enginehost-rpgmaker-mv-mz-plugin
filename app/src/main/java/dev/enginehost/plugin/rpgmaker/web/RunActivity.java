@@ -85,7 +85,7 @@ public final class RunActivity extends Activity {
         webView.getSettings().setDomStorageEnabled(options.optBoolean("domStorage", true));
         webView.getSettings().setDatabaseEnabled(options.optBoolean("database", true));
         webView.getSettings().setMediaPlaybackRequiresUserGesture(
-            options.optBoolean("mediaPlaybackRequiresUserGesture", false));
+            options.optBoolean("mediaPlaybackRequiresGesture", false));
         webView.getSettings().setAllowFileAccess(true);
         webView.getSettings().setAllowContentAccess(false);
         webView.getSettings().setAllowFileAccessFromFileURLs(true);
