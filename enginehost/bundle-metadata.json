@@ -3,78 +3,60 @@
   "engine": "rpgmaker",
   "pluginVersion": "0.1",
   "apiVersion": 1,
-  "entrypoint": "dev.enginehost.plugin.rpgmaker.web.RunActivity",
-  "runtimeTransport": "android-activity",
+  "entrypoint": "dev.enginehost.plugin.rpgmaker.web.RpgMakerWebPlugin",
   "origin": "https://github.com/droidtop/enginehost-rpgmaker-mv-mz-plugin",
   "dexFiles": [
     "classes.dex"
   ],
-  "resourceApks": [
-    "runtime.apk"
-  ],
   "capabilities": [
     {
-      "id": "rpgmaker-mv-web-1.6.2",
+      "id": "rpgmaker-mv-web",
       "engineContext": "mv",
-      "runtimeVersion": "1.6.2",
+      "runtimeVersion": "1.0",
       "acceptsAnyEngineVersion": true
     },
     {
-      "id": "rpgmaker-mz-web-1.9.0",
+      "id": "rpgmaker-mz-web",
       "engineContext": "mz",
-      "runtimeVersion": "1.9.0",
+      "runtimeVersion": "1.0",
       "acceptsAnyEngineVersion": true
     }
   ],
   "declaredOptions": [
     {
-      "key": "entryPoint",
-      "label": "Entry HTML file",
-      "type": "string",
-      "repeats": false,
-      "description": "HTML file the game starts from when no execFile is set; defaults to index.html (RunActivity.java:55)."
-    },
-    {
       "key": "allowNetwork",
       "label": "Allow network access",
       "type": "boolean",
       "repeats": false,
-      "description": "Lets the game load http and https resources; off keeps it entirely offline (RunActivity.java:70)."
+      "description": "Lets the game load http and https resources; off keeps it entirely offline."
     },
     {
-      "key": "webContentsDebugging",
-      "label": "Web contents debugging",
-      "type": "boolean",
+      "key": "entryPoint",
+      "label": "Page to open",
+      "type": "string",
       "repeats": false,
-      "description": "Exposes the game to Chrome's remote debugger; for diagnosing a game that will not start (RunActivity.java:71)."
-    },
-    {
-      "key": "domStorage",
-      "label": "DOM storage",
-      "type": "boolean",
-      "repeats": false,
-      "description": "Enables localStorage, which most MV and MZ games save into (RunActivity.java:91)."
-    },
-    {
-      "key": "database",
-      "label": "Web SQL database",
-      "type": "boolean",
-      "repeats": false,
-      "description": "Enables the WebView database used by some older MV plugins (RunActivity.java:92)."
+      "description": "The HTML file to open when the folder has no www/index.html or index.html; relative to the game folder. execFile takes precedence."
     },
     {
       "key": "mediaPlaybackRequiresGesture",
       "label": "Require a tap before audio",
       "type": "boolean",
       "repeats": false,
-      "description": "When on, audio and video only start after the player touches the screen (RunActivity.java:93)."
+      "description": "When on, audio and video only start after the player touches the screen."
     },
     {
       "key": "userAgent",
       "label": "User agent string",
       "type": "string",
       "repeats": false,
-      "description": "Overrides the browser identity the game sees; a few games branch on it (RunActivity.java:99)."
+      "description": "Overrides the browser identity the game sees; a few games branch on it."
+    },
+    {
+      "key": "webContentsDebugging",
+      "label": "Web contents debugging",
+      "type": "boolean",
+      "repeats": false,
+      "description": "Exposes the game to Chrome's remote debugger, for diagnosing a game that will not start."
     }
   ],
   "source": {
@@ -82,6 +64,6 @@
     "revision": "main"
   },
   "licenses": [
-    "MIT; game-provided RPG Maker runtime and assets are not bundled"
+    "MIT; the game-provided RPG Maker runtime and assets are not bundled"
   ]
 }

@@ -6,4 +6,4 @@ dependencyResolutionManagement {
     repositories { google(); mavenCentral() }
 }
 rootProject.name = "enginehost-rpgmaker-mv-mz-plugin"
-include(":app")
+include(":api", ":app")

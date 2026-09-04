@@ -1,20 +1,38 @@
-# enginehost RPG Maker MV/MZ plugin
+# Enginehost RPG Maker MV/MZ plugin
 
-Programmatically hosts deployed RPG Maker MV and MZ games in place through an
-Android WebView. This is one independently installable runtime in enginehost's
-shared `rpgmaker` plugin family; XP/VX/VX Ace and 2000/2003 live in their own
-engine forks.
+Runs RPG Maker MV and MZ games from their own folder: a Windows deploy (the
+`www` folder is all the runtime needs) or a web deploy.
 
-The game supplies its released RPG Maker JavaScript runtime and assets. The
-plugin supplies the Android web host, validates the requested context and entry
-point, confines local navigation to the game directory, and defaults network
-access off. No game files are copied or modified.
+The game is served to Android's WebView over a private `https` origin, which
+is what its scripts expect of a web deploy, while staying confined to the game
+folder. Network access is off unless the game's config turns it on.
 
-Supported options are `entryPoint`, `allowNetwork`, `domStorage`, `database`,
-`mediaPlaybackRequiresUserGesture`, `userAgent`, and
-`webContentsDebugging`. A top-level `execFile` takes precedence over the option
-entry point after enginehost has completed its authoritative folder-first
-configuration merge.
+## Saves live on disk
 
-The first build declares only MV 1.6.2 and MZ 1.9.0. Wider spans will be added
-only after game-level verification. Android builds run in GitHub Actions only.
+A WebView keeps `localStorage` in the app's private data and shares one store
+between every page it opens, so two games would overwrite each other's saves.
+This plugin replaces the page's `localStorage` before the game's first script
+runs with a store backed by `localStorage.json` in the save folder Enginehost
+chose for the game (its folder name, written into `enginehost.json` as
+`saveFolder`). MV saves into it directly; MZ's localforage is pointed at it.
+
+## Audio
+
+RPG Maker MV asks a mobile browser for `.m4a` audio and a Windows deploy
+ships only `.ogg`. When a requested audio file does not exist and its sibling
+in the other format does, the sibling is served.
+
+## Options
+
+`allowNetwork`, `entryPoint`, `mediaPlaybackRequiresGesture`, `userAgent`,
+`webContentsDebugging`; see `enginehost/bundle-metadata.json`.
+
+## Releases
+
+GitHub Releases form the catalog Enginehost reads. Every build is signed;
+`enginehost-public-key.json` is the repository key Enginehost pins before
+accepting a bundle. Builds publish on the unstable channel on every push, and
+are promoted to testing and stable by hand once they have run real games.
+
+MIT-licensed. The RPG Maker runtime and the game's assets are the game's own
+and are not redistributed.
