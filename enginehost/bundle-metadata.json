@@ -28,49 +28,49 @@
       "label": "Entry HTML file",
       "type": "string",
       "repeats": false,
-      "description": "HTML file the game starts from when no execFile is set; defaults to index.html (RunActivity.java:53)."
+      "description": "HTML file the game starts from when no execFile is set; defaults to index.html (RunActivity.java:55)."
     },
     {
       "key": "allowNetwork",
       "label": "Allow network access",
       "type": "boolean",
       "repeats": false,
-      "description": "Lets the game load http and https resources; off keeps it entirely offline (RunActivity.java:68)."
+      "description": "Lets the game load http and https resources; off keeps it entirely offline (RunActivity.java:70)."
     },
     {
       "key": "webContentsDebugging",
       "label": "Web contents debugging",
       "type": "boolean",
       "repeats": false,
-      "description": "Exposes the game to Chrome's remote debugger; for diagnosing a game that will not start (RunActivity.java:69)."
+      "description": "Exposes the game to Chrome's remote debugger; for diagnosing a game that will not start (RunActivity.java:71)."
     },
     {
       "key": "domStorage",
       "label": "DOM storage",
       "type": "boolean",
       "repeats": false,
-      "description": "Enables localStorage, which most MV and MZ games save into (RunActivity.java:85)."
+      "description": "Enables localStorage, which most MV and MZ games save into (RunActivity.java:91)."
     },
     {
       "key": "database",
       "label": "Web SQL database",
       "type": "boolean",
       "repeats": false,
-      "description": "Enables the WebView database used by some older MV plugins (RunActivity.java:86)."
+      "description": "Enables the WebView database used by some older MV plugins (RunActivity.java:92)."
     },
     {
       "key": "mediaPlaybackRequiresGesture",
       "label": "Require a tap before audio",
       "type": "boolean",
       "repeats": false,
-      "description": "When on, audio and video only start after the player touches the screen (RunActivity.java:87)."
+      "description": "When on, audio and video only start after the player touches the screen (RunActivity.java:93)."
     },
     {
       "key": "userAgent",
       "label": "User agent string",
       "type": "string",
       "repeats": false,
-      "description": "Overrides the browser identity the game sees; a few games branch on it (RunActivity.java:93)."
+      "description": "Overrides the browser identity the game sees; a few games branch on it (RunActivity.java:99)."
     }
   ],
   "source": {
