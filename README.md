@@ -27,11 +27,23 @@ in the other format does, the sibling is served.
 `allowNetwork`, `entryPoint`, `mediaPlaybackRequiresGesture`, `userAgent`,
 `webContentsDebugging`; see `enginehost/bundle-metadata.json`.
 
+## Branches
+
+This plugin has no upstream engine: the RPG Maker runtime is the game's own
+JavaScript, so everything here is the wrapper. `plugin-core` is the wrapper and
+this repository's main line (owner, 2026-10-14: its main branch is its
+plugin-core; `main` stays at its last commit as history). The line
+`plugin/stable` is generated, never edited: it is the empty tree plus
+plugin-core, pinned in its `enginehost/line.json` and checked on every push by
+`.github/workflows/plugin-line.yml` (Enginehost docs/plugin-lines.md). A change
+lands on plugin-core and the line is recomposed with droidtop-platforms
+`tools/plugin_line.py compose stable --branch plugin/stable`.
+
 ## Releases
 
 GitHub Releases form the catalog Enginehost reads. Every build is signed;
 `enginehost-public-key.json` is the repository key Enginehost pins before
-accepting a bundle. Builds publish on the unstable channel on every push, and
+accepting a bundle. Builds of `plugin/stable` publish on the unstable channel on every push, and
 are promoted to testing and stable by hand once they have run real games.
 
 GPL-3.0 licensed. The RPG Maker runtime and the game's assets are the game's own

@@ -1,0 +1,8 @@
+{
+  "upstream": {
+    "repo": "none",
+    "ref": "no upstream engine: the empty tree",
+    "commit": "84e286badc7a6eef963bc8d21afef6e138999d1b"
+  },
+  "version": "1.0"
+}
