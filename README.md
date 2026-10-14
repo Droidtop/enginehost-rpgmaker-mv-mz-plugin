@@ -34,5 +34,9 @@ GitHub Releases form the catalog Enginehost reads. Every build is signed;
 accepting a bundle. Builds publish on the unstable channel on every push, and
 are promoted to testing and stable by hand once they have run real games.
 
-MIT-licensed. The RPG Maker runtime and the game's assets are the game's own
+GPL-3.0 licensed. The RPG Maker runtime and the game's assets are the game's own
 and are not redistributed.
+
+## Licence
+
+GPL-3.0, see [LICENSE](LICENSE) and [NOTICE](NOTICE). All code here is ours; the third-party attributions in NOTICE and THIRD_PARTY.md keep their own notices.

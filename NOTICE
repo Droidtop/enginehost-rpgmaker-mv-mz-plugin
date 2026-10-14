@@ -1,0 +1,4 @@
+RPG Maker MV/MZ plugin for Enginehost
+Copyright the Droidtop contributors. Licensed under the GNU General Public License, version 3 (LICENSE).
+
+A WebView wrapper. It vendors no RPG Maker runtime; the runtime and the game's assets are the game's own.
