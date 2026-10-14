@@ -1,0 +1,69 @@
+{
+  "bundleId": "dev.enginehost.rpgmaker.mv-mz.v1",
+  "engine": "rpgmaker",
+  "pluginVersion": "1.0.2",
+  "apiVersion": 1,
+  "entrypoint": "dev.enginehost.plugin.rpgmaker.web.RpgMakerWebPlugin",
+  "origin": "https://github.com/droidtop/enginehost-rpgmaker-mv-mz-plugin",
+  "dexFiles": [
+    "classes.dex"
+  ],
+  "capabilities": [
+    {
+      "id": "rpgmaker-mv-web",
+      "engineContext": "mv",
+      "runtimeVersion": "1.0",
+      "acceptsAnyEngineVersion": true
+    },
+    {
+      "id": "rpgmaker-mz-web",
+      "engineContext": "mz",
+      "runtimeVersion": "1.0",
+      "acceptsAnyEngineVersion": true
+    }
+  ],
+  "declaredOptions": [
+    {
+      "key": "allowNetwork",
+      "label": "Allow network access",
+      "type": "boolean",
+      "repeats": false,
+      "description": "Lets the game load http and https resources; off keeps it entirely offline."
+    },
+    {
+      "key": "entryPoint",
+      "label": "Page to open",
+      "type": "string",
+      "repeats": false,
+      "description": "The HTML file to open when the folder has no www/index.html or index.html; relative to the game folder. execFile takes precedence."
+    },
+    {
+      "key": "mediaPlaybackRequiresGesture",
+      "label": "Require a tap before audio",
+      "type": "boolean",
+      "repeats": false,
+      "description": "When on, audio and video only start after the player touches the screen."
+    },
+    {
+      "key": "userAgent",
+      "label": "User agent string",
+      "type": "string",
+      "repeats": false,
+      "description": "Overrides the browser identity the game sees; a few games branch on it."
+    },
+    {
+      "key": "webContentsDebugging",
+      "label": "Web contents debugging",
+      "type": "boolean",
+      "repeats": false,
+      "description": "Exposes the game to Chrome's remote debugger, for diagnosing a game that will not start."
+    }
+  ],
+  "source": {
+    "upstream": "https://github.com/Droidtop/enginehost-rpgmaker-mv-mz-plugin",
+    "revision": "plugin-core (no upstream engine)"
+  },
+  "licenses": [
+    "GPL-3.0; the game-provided RPG Maker runtime and assets are not bundled"
+  ]
+}

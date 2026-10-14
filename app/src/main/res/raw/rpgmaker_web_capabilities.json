@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "capabilities": [
+    { "id": "rpgmaker-mv-web", "engineContext": "mv", "runtimeVersion": "1.0", "acceptsAnyEngineVersion": true },
+    { "id": "rpgmaker-mz-web", "engineContext": "mz", "runtimeVersion": "1.0", "acceptsAnyEngineVersion": true }
+  ]
+}
