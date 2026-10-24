@@ -10,6 +10,11 @@ overwritten.
 
 ## [Unreleased]
 
+### Changed
+
+- 1.0.3: a link the game opens is offered by Enginehost (`EngineHost.openLink`) instead of
+  being silently dropped.
+
 ### Added
 
 - A permanent, never-overwritten release for every bundle build published

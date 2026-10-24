@@ -98,7 +98,13 @@ public final class RpgMakerWebPlugin implements EnginePlugin {
         });
         webView.setWebViewClient(new WebViewClient() {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                return !server.serves(request.getUrl());
+                if (server.serves(request.getUrl())) return false;
+                // A link the game opens (an <a>, location change or window.open, which stays in
+                // this view): offered by Enginehost and never opened here (Enginehost docs/SPEC.md,
+                // "Links a game opens"). Only a navigation the person caused is offered, so a game
+                // cannot raise the sheet over and over by itself; the view never leaves the game.
+                if (request.isForMainFrame() && request.hasGesture()) offerLink(session, request.getUrl().toString());
+                return true;
             }
 
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
@@ -113,6 +119,15 @@ public final class RpgMakerWebPlugin implements EnginePlugin {
         session.display().addView(webView, new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         webView.loadUrl(server.entryUrl());
+    }
+
+    private static void offerLink(EnginePluginSession session, String url) {
+        try {
+            session.host().openLink(url);
+        } catch (IncompatibleClassChangeError olderHost) {
+            // An Enginehost from before openLink(): the link is not opened, as before.
+            session.host().log(android.util.Log.INFO, TAG, "This Enginehost cannot offer a link; it was not opened", null);
+        }
     }
 
     /**
