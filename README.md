@@ -16,6 +16,15 @@ runs with a store backed by `localStorage.json` in the save folder Enginehost
 chose for the game (its folder name, written into `enginehost.json` as
 `saveFolder`). MV saves into it directly; MZ's localforage is pointed at it.
 
+## Links
+
+A link the game opens (an `<a>`, a location change, or `window.open`, which stays in the game's
+view) is never followed here. When the person caused it, it goes to `EngineHost.openLink`:
+Enginehost checks it, says what it is, and offers to open it in the matching app or a browser, or
+to copy it (Enginehost docs/SPEC.md, "Links a game opens"). Navigation the game starts by itself
+is dropped, so a game cannot raise the offer over and over. NW.js's `Shell.openExternal` is not
+shimmed: defining `require` would make games think they run on desktop NW.js and reach for `fs`.
+
 ## Audio
 
 RPG Maker MV asks a mobile browser for `.m4a` audio and a Windows deploy
