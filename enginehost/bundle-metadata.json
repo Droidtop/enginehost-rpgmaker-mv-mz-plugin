@@ -1,7 +1,7 @@
 {
   "bundleId": "dev.enginehost.rpgmaker.mv-mz.v1",
   "engine": "rpgmaker",
-  "pluginVersion": "1.0.4",
+  "pluginVersion": "1.0.5",
   "lockdown": true,
   "apiVersion": 1,
   "entrypoint": "dev.enginehost.plugin.rpgmaker.web.RpgMakerWebPlugin",
