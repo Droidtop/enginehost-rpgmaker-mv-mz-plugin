@@ -1,17 +1,11 @@
 package dev.enginehost.plugin.rpgmaker.web;
 
-import android.annotation.SuppressLint;
-import android.view.ViewGroup;
-import android.webkit.ConsoleMessage;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import dev.enginehost.api.EngineControllerEvent;
 import dev.enginehost.api.EnginePlugin;
 import dev.enginehost.api.EnginePluginSession;
+import dev.enginehost.web.GameServer;
+import dev.enginehost.web.GameWebView;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,16 +14,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.json.JSONObject;
 
 /**
  * RPG Maker MV and MZ games, run from their own folder in a confined browser.
  *
- * The game is served over a private https origin (see {@link GameServer}),
- * which is what its scripts expect of a web deploy. Saves never live in the
- * WebView: {@link LocalStorageBridge} replaces localStorage, which MV saves
- * into directly and MZ through localforage, with a store whose file sits in
- * the save folder Enginehost chose for this game.
+ * The browser, the private https origin the game is served from (what its
+ * scripts expect of a web deploy) and the save-folder localStorage, which MV
+ * saves into directly and MZ through localforage, are Enginehost's plugin-web
+ * ({@link GameWebView}), shared with the HTML core. What is this core's own:
+ * the engine it accepts, where a deploy keeps its page, the audio stand-in,
+ * the localforage hook, and the pad's buttons in the game's own Input.
  */
 public final class RpgMakerWebPlugin implements EnginePlugin {
     private static final String TAG = "enginehost-rpgmaker";
@@ -52,82 +46,55 @@ public final class RpgMakerWebPlugin implements EnginePlugin {
         STICKS.put("right_y", Arrays.asList("up", "down"));
     }
 
-    private WebView webView;
-    private GameServer server;
-    private LocalStorageBridge storage;
+    private static final GameServer.Site SITE = new GameServer.Site() {
+        // A Windows deploy keeps the game under www; a web deploy is flat.
+        @Override public String[] entryPages() { return new String[] {"www/index.html", "index.html"}; }
+
+        @Override public File standIn(File missing) { return audioSibling(missing); }
+
+        // RPG Maker MZ saves through localforage, which prefers IndexedDB;
+        // point it at localStorage the moment the library appears so MZ
+        // saves land in the same file as MV's.
+        @Override public String pageScript() {
+            return "(function(){var forage;\n"
+                + "try{Object.defineProperty(window,'localforage',{configurable:true,\n"
+                + " get:function(){return forage;},\n"
+                + " set:function(v){forage=v;try{if(v&&v.config&&v.LOCALSTORAGE)v.config({driver:[v.LOCALSTORAGE]});}catch(e){}}});}catch(e){}\n"
+                + "})();\n";
+        }
+    };
+
+    private GameWebView game;
     /** The button each action is holding down now, if any. */
     private final Map<String, String> held = new HashMap<>();
     /** The actions holding each button down: it is up again when the last lets go. */
     private final Map<String, Set<String>> holders = new HashMap<>();
 
     @Override
-    @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     public void onCreate(EnginePluginSession session) throws Exception {
         String context = session.engineContext();
         if (!"rpgmaker".equals(session.engine()) || !("mv".equals(context) || "mz".equals(context))) {
             throw new IOException("This runtime runs RPG Maker MV and MZ, not " + session.engine() + " " + context);
         }
-        File gameRoot = new File(session.gamePath()).getCanonicalFile();
-        if (!gameRoot.isDirectory()) throw new IOException("The game folder is not readable");
-        JSONObject options = new JSONObject(session.optionsJson() == null ? "{}" : session.optionsJson());
-
-        storage = new LocalStorageBridge(new File(session.host().saveDirectory(), "localStorage.json"),
-            (priority, message, error) -> session.host().log(priority, TAG, message, error));
-        server = new GameServer(gameRoot, session.execFile(), options);
-
-        webView = new WebView(session.host().context());
-        WebSettings settings = webView.getSettings();
-        settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true); // sessionStorage; saves go through the bridge
-        settings.setAllowFileAccess(false);
-        settings.setAllowContentAccess(false);
-        settings.setMediaPlaybackRequiresUserGesture(options.optBoolean("mediaPlaybackRequiresGesture", false));
-        settings.setLoadWithOverviewMode(true);
-        settings.setUseWideViewPort(true);
-        String userAgent = options.optString("userAgent", "");
-        if (!userAgent.isBlank()) settings.setUserAgentString(userAgent);
-        WebView.setWebContentsDebuggingEnabled(options.optBoolean("webContentsDebugging", false));
-        webView.setBackgroundColor(0xFF000000);
-        webView.addJavascriptInterface(storage, LocalStorageBridge.JS_NAME);
-        webView.setWebChromeClient(new WebChromeClient() {
-            @Override public boolean onConsoleMessage(ConsoleMessage message) {
-                int priority = message.messageLevel() == ConsoleMessage.MessageLevel.ERROR ? android.util.Log.ERROR : android.util.Log.DEBUG;
-                session.host().log(priority, TAG, message.message() + " (" + message.sourceId() + ":" + message.lineNumber() + ")", null);
-                return true;
-            }
-        });
-        webView.setWebViewClient(new WebViewClient() {
-            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                if (server.serves(request.getUrl())) return false;
-                // A link the game opens (an <a>, location change or window.open, which stays in
-                // this view): offered by Enginehost and never opened here (Enginehost docs/SPEC.md,
-                // "Links a game opens"). Only a navigation the person caused is offered, so a game
-                // cannot raise the sheet over and over by itself; the view never leaves the game.
-                if (request.isForMainFrame() && request.hasGesture()) offerLink(session, request.getUrl().toString());
-                return true;
-            }
-
-            @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                try {
-                    return server.respond(request);
-                } catch (IOException error) {
-                    session.host().log(android.util.Log.WARN, TAG, "Could not serve " + request.getUrl(), error);
-                    return GameServer.status(500, "Internal error");
-                }
-            }
-        });
-        session.display().addView(webView, new ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        webView.loadUrl(server.entryUrl());
+        game = GameWebView.open(session, TAG, SITE);
     }
 
-    private static void offerLink(EnginePluginSession session, String url) {
-        try {
-            session.host().openLink(url);
-        } catch (IncompatibleClassChangeError olderHost) {
-            // An Enginehost from before openLink(): the link is not opened, as before.
-            session.host().log(android.util.Log.INFO, TAG, "This Enginehost cannot offer a link; it was not opened", null);
-        }
+    /**
+     * RPG Maker MV's AudioManager.audioFileExt asks a mobile browser for
+     * ".m4a" because iOS Safari could not decode Vorbis, while a Windows
+     * deploy ships only the .ogg files; every sound then failed to load and
+     * the game stopped at its title screen. The WebView decodes Vorbis, and
+     * decodeAudioData reads the container from the bytes, so the sibling in
+     * the other format is served when the requested one does not exist.
+     */
+    private static File audioSibling(File wanted) {
+        String name = wanted.getName();
+        String sibling;
+        if (name.endsWith(".m4a")) sibling = name.substring(0, name.length() - 4) + ".ogg";
+        else if (name.endsWith(".ogg")) sibling = name.substring(0, name.length() - 4) + ".m4a";
+        else return null;
+        File file = new File(wanted.getParentFile(), sibling);
+        return file.isFile() ? file : null;
     }
 
     /**
@@ -141,7 +108,7 @@ public final class RpgMakerWebPlugin implements EnginePlugin {
      * trigger and a repeat out of it exactly as for a key.
      */
     @Override public boolean onControllerEvent(EngineControllerEvent event) {
-        if (webView == null) return false;
+        if (game == null || game.view() == null) return false;
         String action = event.action();
         String wanted;
         List<String> stick = STICKS.get(action);
@@ -173,23 +140,15 @@ public final class RpgMakerWebPlugin implements EnginePlugin {
 
     /** [name] is one of {@link #BUTTONS}, so it is safe to write into the script. */
     private void setButton(String name, boolean down) {
-        webView.evaluateJavascript("(function(){var i=window.Input;"
+        WebView view = game.view();
+        if (view == null) return;
+        view.evaluateJavascript("(function(){var i=window.Input;"
             + "if(i&&i._currentState)i._currentState['" + name + "']=" + down + ";})()", null);
     }
 
-    @Override public void onResume() { if (webView != null) webView.onResume(); }
+    @Override public void onResume() { if (game != null) game.onResume(); }
 
-    @Override public void onPause() {
-        if (webView != null) webView.onPause();
-        if (storage != null) storage.flush();
-    }
+    @Override public void onPause() { if (game != null) game.onPause(); }
 
-    @Override public void onDestroy() {
-        if (storage != null) storage.flush();
-        if (webView != null) {
-            webView.stopLoading();
-            webView.destroy();
-            webView = null;
-        }
-    }
+    @Override public void onDestroy() { if (game != null) game.onDestroy(); }
 }
